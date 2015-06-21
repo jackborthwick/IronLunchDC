@@ -7,9 +7,12 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <MapKit/MapKit.h>
+#import <CoreLocation/CoreLocation.h>
 
-@interface FirstViewController : UIViewController
+@interface FirstViewController : UIViewController  <MKMapViewDelegate, CLLocationManagerDelegate, UISearchBarDelegate>
 
+@property (nonatomic, weak) IBOutlet UISearchBar *searchBar;
 
 @end
 

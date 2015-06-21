@@ -7,9 +7,10 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "Results.h"
+@interface SecondViewController : UIViewController <UITableViewDelegate, UITableViewDataSource, UISearchBarDelegate>
 
-@interface SecondViewController : UIViewController
-
+@property (nonatomic, weak) IBOutlet UISearchBar *searchBarForTable;
 
 @end
 
