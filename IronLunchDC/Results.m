@@ -8,6 +8,7 @@
 
 #import "Results.h"
 #import "FirstViewController.h"
+#import "GoogleMaps/GoogleMaps.h"
 @implementation Results
 
 + (id)sharedHelper {
@@ -19,7 +20,11 @@
     return sharedHelper;
 }
 
-
+//GMSMarker *marker = [[GMSMarker alloc] init];
+//marker.position = CLLocationCoordinate2DMake(-33.86, 151.20);
+//marker.title = @"Sydney";
+//marker.snippet = @"Australia";
+//marker.map = mapViewG;
 
 - (void)getResults:(NSString *) searchString {
     _dataArray = [[NSMutableArray alloc]init];
@@ -34,10 +39,10 @@
         }
         else {
             for (MKMapItem *item in response.mapItems) {
-                MKPointAnnotation *pa = [[MKPointAnnotation alloc] init];
-                pa.coordinate = item.placemark.location.coordinate;
+                GMSMarker *pa = [[GMSMarker alloc] init];
+                pa.position = item.placemark.location.coordinate;
                 pa.title = item.name;
-                pa.subtitle = [NSString stringWithFormat:@"Local search:%f.%f",item.placemark.location.coordinate.latitude, item.placemark.location.coordinate.longitude];
+                pa.snippet = [NSString stringWithFormat:@"Local search:%f.%f",item.placemark.location.coordinate.latitude, item.placemark.location.coordinate.longitude];
                 
                 [_dataArray addObject:pa];
                 NSLog(@"I GOT %@",pa.title);

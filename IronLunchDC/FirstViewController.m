@@ -11,19 +11,23 @@
 #import "FirstViewController.h"
 #import "Results.h"
 #import "AppDelegate.h"
+#import <GoogleMaps/GoogleMaps.h>
+
 @interface FirstViewController ()
 
 @property (nonatomic, strong) CLLocationManager *locationManager;
 @property (nonatomic, weak) IBOutlet MKMapView  *mapView;
 @property (nonatomic, strong) Results *resultsManager;
 @property (nonatomic, strong) AppDelegate *appDelegate;
+@property (nonatomic, strong) CLLocation *lastLocation;
 
 @end
 
-@implementation FirstViewController
+@implementation FirstViewController{
+    GMSMapView *mapViewG;
+}
 
 -(void)searchBarSearchButtonClicked:(UISearchBar *)searchBar {
-    [self removeExistingAnnotations];
     [self getSearchResults];
 }
 
@@ -50,33 +54,27 @@
     }];
 }
 
-#pragma mark - Map Methods
+#pragma mark - google map methods
 
--(void)annotateMapLocations {//THROW ALL OF THE SEARCH RESULTS HERE AND ADD THEM
-    NSMutableArray *locs = [[NSMutableArray alloc] init];
-    for (id <MKAnnotation> annot in [_mapView annotations]) {
-        [locs addObject:annot];
-    }
-    [_mapView removeAnnotations:locs];
-    
-    NSMutableArray *annotationArray = [[NSMutableArray alloc] init];
-    MKPointAnnotation *pa = [[MKPointAnnotation alloc] init];
-    pa.coordinate = CLLocationCoordinate2DMake(39,-77);
-    pa.title = @"near the dmv";
-    [annotationArray addObject:pa];
-    MKPointAnnotation *da = [[MKPointAnnotation alloc] init];
-    da.coordinate = CLLocationCoordinate2DMake(39.1,-77);
-    da.title = @"kinda near the dmv";
-    [annotationArray addObject:da];
-    [_mapView addAnnotations:annotationArray];
+- (void)zoomToCurrentLocation {
+    GMSCameraPosition *myLocationCP =  [GMSCameraPosition cameraWithLatitude:_lastLocation.coordinate.latitude
+                                                                   longitude:_lastLocation.coordinate.longitude
+                                                                        zoom:6];
+    NSLog(@"ZOOMIN TO %f %f",_lastLocation.coordinate.latitude,_lastLocation.coordinate.longitude);
+    mapViewG.camera = myLocationCP;
+    [mapViewG reloadInputViews];
 }
 
+
+#pragma mark - Map Methods
+
+
 - (void) locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations {
-    CLLocation *lastLocation = locations.lastObject;
-    NSLog(@"location: %f,%f",lastLocation.coordinate.latitude,lastLocation.coordinate.longitude);
-    
-    [self zoomToLocationWithLat:lastLocation.coordinate.latitude andLon:lastLocation.coordinate.longitude];
+    _lastLocation = locations.lastObject;
+    NSLog(@"location: %f,%f",_lastLocation.coordinate.latitude,_lastLocation.coordinate.longitude);
+    [self zoomToCurrentLocation];
     [_locationManager stopUpdatingLocation];
+    
 }
 
 - (void)turnOnLocationMonitoring {
@@ -130,22 +128,7 @@
     }
 }
 
-- (MKAnnotationView *)mapView:(MKMapView *)mapView viewForAnnotation:(id<MKAnnotation>)annotation {
-    if (annotation != mapView.userLocation) {
-        MKPinAnnotationView *anotationView = (MKPinAnnotationView *)[mapView dequeueReusableAnnotationViewWithIdentifier:@"pin"];
-        if (anotationView == nil) {
-            anotationView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"DAT DER SPOT"];
-            anotationView.canShowCallout = true;
-            anotationView.pinColor = MKPinAnnotationColorGreen;
-            anotationView.animatesDrop = true;
-        }
-        else {
-            anotationView.annotation = annotation;
-        }
-        return anotationView;
-    }
-    return nil;
-}
+
 - (void)getSearchResults {
     _resultsManager = [Results sharedHelper];
     [_resultsManager getResults:_searchBar.text];
@@ -153,22 +136,15 @@
 }
 - (void)newDataReceived {
     NSLog(@"TITLE IS %@",[[[_resultsManager dataArray] objectAtIndex:0]title]);
-    NSLog(@"COUNT IS %li",[_resultsManager dataArray].count);
-    NSLog(@"%@",[[[_resultsManager dataArray] objectAtIndex:1]subtitle]);
-    for (MKPointAnnotation *item in [_resultsManager dataArray]) {
-        [_mapView addAnnotation:item];
+    NSLog(@"COUNT IS %li",(unsigned long)[_resultsManager dataArray].count);
+    NSLog(@"%@",[[[_resultsManager dataArray] objectAtIndex:1]snippet]);
+    for (GMSMarker *item in [_resultsManager dataArray]) {
+        item.map = mapViewG;
     }
     
 }
 
-- (void)removeExistingAnnotations {
-    NSMutableArray *locs = [[NSMutableArray alloc] init];
-    for (id <MKAnnotation> annot in [_mapView annotations]) {
-        [locs addObject:annot];
-    }
-    [_mapView removeAnnotations:locs];
-    NSLog(@"removing existing annotations");
-}
+
 
 #pragma mark - Life Cycle Methods
 
@@ -179,30 +155,34 @@
     _appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
     _resultsManager = _appDelegate.resultsManager;
     
-    // Do any additional setup after loading the view, typically from a nib.
+
+
+    
+    GMSCameraPosition *camera = [GMSCameraPosition cameraWithLatitude:mapViewG.myLocation.coordinate.latitude
+                                                            longitude:mapViewG.myLocation.coordinate.longitude
+                                                                 zoom:6];
+    mapViewG = [GMSMapView mapWithFrame:CGRectZero camera:camera];
+    mapViewG.myLocationEnabled = YES;
+    self.view = mapViewG;
+    [self zoomToCurrentLocation];
+    //mapViewG.reloadInputViews;
+
+    
+    
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-
-    [self annotateMapLocations];
-    [_mapView showAnnotations:[_mapView annotations] animated:true];
+    //[self zoomToCurrentLocation];
+    //mapViewG.reloadInputViews;
     
-    [self removeExistingAnnotations];
-    [_mapView addAnnotations:[_resultsManager dataArray]];
-
-//    for (MKPointAnnotation *testPoint in [_resultsManager dataArray]) {
-//        NSLog(@"Got: %@",[testPoint title]);
-//    }
     NSLog(@"done");
-    // Do any additional setup after loading the view, typically from a nib.
 }
 
 
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
 }
 
 @end

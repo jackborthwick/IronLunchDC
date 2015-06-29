@@ -17,12 +17,6 @@
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="0vq-Tw-QJi">
-                                <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
-                                <connections>
-                                    <outlet property="delegate" destination="9pv-A4-QxB" id="Xrk-G9-I9Y"/>
-                                </connections>
-                            </mapView>
                             <searchBar contentMode="redraw" translatesAutoresizingMaskIntoConstraints="NO" id="GIl-sw-Bse">
                                 <rect key="frame" x="0.0" y="0.0" width="600" height="44"/>
                                 <textInputTraits key="textInputTraits"/>
@@ -33,18 +27,13 @@
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstAttribute="trailingMargin" secondItem="0vq-Tw-QJi" secondAttribute="trailing" constant="-16" id="4qS-FS-lIn"/>
-                            <constraint firstItem="4ug-Mw-9AY" firstAttribute="top" secondItem="0vq-Tw-QJi" secondAttribute="bottom" constant="-49" id="77X-Un-zyF"/>
                             <constraint firstItem="GIl-sw-Bse" firstAttribute="leading" secondItem="tsR-hK-woN" secondAttribute="leadingMargin" constant="-16" id="iTY-bV-DQE"/>
-                            <constraint firstItem="0vq-Tw-QJi" firstAttribute="top" secondItem="GIl-sw-Bse" secondAttribute="bottom" constant="-44" id="jee-cs-Jm4"/>
                             <constraint firstAttribute="trailingMargin" secondItem="GIl-sw-Bse" secondAttribute="trailing" constant="-16" id="kvq-xB-B37"/>
-                            <constraint firstItem="0vq-Tw-QJi" firstAttribute="leading" secondItem="tsR-hK-woN" secondAttribute="leadingMargin" constant="-16" id="sCG-h2-hVj"/>
                             <constraint firstItem="GIl-sw-Bse" firstAttribute="top" secondItem="Ia1-K6-d13" secondAttribute="bottom" constant="-20" id="uFp-Px-Ty7"/>
                         </constraints>
                     </view>
                     <tabBarItem key="tabBarItem" title="First" image="first" id="acW-dT-cKf"/>
                     <connections>
-                        <outlet property="mapView" destination="0vq-Tw-QJi" id="tPy-2k-60U"/>
                         <outlet property="searchBar" destination="GIl-sw-Bse" id="b8v-Os-4Z2"/>
                     </connections>
                 </viewController>
@@ -77,7 +66,7 @@
                                 <constraints>
                                     <constraint firstAttribute="height" constant="44" id="on9-9x-yYG"/>
                                 </constraints>
-                                <textInputTraits key="textInputTraits"/>
+                                <textInputTraits key="textInputTraits" enablesReturnKeyAutomatically="YES"/>
                                 <connections>
                                     <outlet property="delegate" destination="8rJ-Kc-sve" id="r2f-tm-7AE"/>
                                 </connections>
